@@ -40,3 +40,12 @@ class Github:
     
         return response
     
+    def rate_limit(self):
+        r = requests.get('https://api.github.com/rate_limit')
+        body = r.json()
+        return body
+    
+    def repo_language(self, owner, repo):
+        r = requests.get(f'https://api.github.com/repos/{owner}/{repo}/languages')
+        body = r.json()
+        return body
