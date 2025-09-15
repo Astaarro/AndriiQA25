@@ -1,0 +1,38 @@
+# кеші та тимчасові файли
+*.log
+*.tmp
+*.swp
+
+# системні файли
+.DS_Store
+Thumbs.db
+
+# IDE / редактори
+.vscode/
+.idea/
+
+# тестові результати
+/tests/reports/
+coverage/
+*.coverage
+*.lcov
+
+# node.js (якщо проект JS)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PHP composer
+/vendor/
+
+# build артефакти
+dist/
+build/
+out/
+
+# env-файли (секрети)
+.env
+.env.local
