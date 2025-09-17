@@ -43,7 +43,7 @@ def test_check_incorrect_username():
     driver.close()
 
 
-# INDIVIDUAL WORK
+# INDIVIDUAL WORK without PAGE OBGECT
 
 # ROZETKA.COM.UA
 # 1. Search "iphone".
@@ -115,69 +115,102 @@ def test_search_product_prom():
 @pytest.mark.ui_eros
 def test_checkout_eros():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    driver.maximize_window()  # Щоб елементи не перекривались мобільними меню
-    
+    driver.maximize_window()
     
     # 1. Відкриваємо головну сторінку
     driver.get("https://eros.in.ua/")
-
-    # 2. Знаходимо картку товару
-    # Ми використовуємо CSS-селектор для пошуку елемента-контейнера,
-    # що містить посилання з назвою товару.
-    product_card = driver.find_element(
-        By.CSS_SELECTOR,
-        "div.product-element-bottom:has(a[href*='pretty-love-robert'])"
+    
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "product-element-bottom"))
     )
 
-    # 3. Знаходимо кнопку "Купити" поруч із товаром
+    # 2. Знаходимо першу картку товару на сторінці
+    try:
+        product_card = driver.find_element(By.CSS_SELECTOR, ".product-element-bottom")
+    except NoSuchElementException:
+        print("Не вдалося знайти картку товару на головній сторінці. Тест буде пропущено.")
+        driver.quit()
+        pytest.skip("Немає доступних товарів для тестування.")
+
+    # 3. Знаходимо назву товару та посилання на нього
+    # Використовуємо більш загальний селектор для посилання на товар
+    product_link = product_card.find_element(By.CSS_SELECTOR, "a[href]")
+    product_name = product_link.text
+    
+    if not product_name:
+        print("Знайдено картку товару без назви. Пропускаємо цей товар.")
+        driver.quit()
+        pytest.skip("Товар без назви.")
+        
+    print(f"Знайдено товар: '{product_name}'")
+
+    # 4. Знаходимо кнопку "Купити" поруч із товаром
     buy_button = product_card.find_element(By.CLASS_NAME, "add_to_cart_button")
-    # Скролимо до кнопки та натискаємо
+    
     driver.execute_script("arguments[0].scrollIntoView();", buy_button)
     time.sleep(1)
     buy_button.click()
-
-    # 4. Чекаємо AJAX, щоб товар додався
-    time.sleep(5)
+    
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".header-cart-link"))
+    )
+    print("Товар додано до кошика.")
 
     # 5. Переходимо на сторінку кошика
     driver.get("https://eros.in.ua/cart/")
 
-    # 6. Перевіряємо заголовок сторінки кошика
     WebDriverWait(driver, 10).until(EC.title_contains("Кошик"))
     assert "Кошик 💘 Інтим-Бутік ЕРОС" == driver.title
-
-    # 7. Перевіряємо, що товар присутній у кошику і має правильну назву
-    cart_item = driver.find_element(
-    By.PARTIAL_LINK_TEXT,
-    "Hi-tech вібратор Pretty Love Robert"
+    
+    # 6. Перевіряємо, що товар присутній у кошику та має правильну назву
+    cart_item_locator = (By.PARTIAL_LINK_TEXT, product_name)
+    cart_item = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(cart_item_locator)
     )
     assert cart_item.is_displayed()
+    assert product_name in cart_item.text
+    print(f"Товар '{product_name}' знайдено в кошику.")
 
-    # 8. Натискаємо кнопку "Перейти до оформлення"
-    checkout_button = driver.find_element(By.CLASS_NAME, "checkout-button")
+    # 7. Натискаємо кнопку "Перейти до оформлення"
+    checkout_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "checkout-button"))
+    )
     checkout_button.click()
+    print("Перехід до оформлення.")
 
-    # 9. Чекаємо, поки заголовок сторінки оформлення стане правильним
+    # 8. Чекаємо, поки заголовок сторінки оформлення стане правильним
     WebDriverWait(driver, 10).until(EC.title_contains("Оформлення замовлення"))
     assert "Оформлення замовлення 💘 Інтим-Бутік ЕРОС" == driver.title
-
-    # 10. Натискаємо "Підтвердити замовлення" (очікувано виникне повідомлення про обов’язкові поля)
-
-    time.sleep(5)
-    place_order_button = driver.find_element(By.ID, "place_order")
+    
+    # 9. Натискаємо "Підтвердити замовлення"
+    try:
+        WebDriverWait(driver, 5).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, "div.blockUI.blockOverlay"))
+        )
+    except:
+        pass
+    
+    place_order_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "place_order"))
+    )
     place_order_button.click()
-    time.sleep(10)
-    # Перевіряємо повідомлення про обов’язкове поле
-    error_message = driver.find_element(By.ID, "billing_first_name_description")
+    print("Клік по кнопці 'Підтвердити замовлення'.")
+    
+    # 10. Перевіряємо повідомлення про обов’язкове поле
+    error_message = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".woocommerce-error"))
+    )
     assert "обов'язкове поле" in error_message.text
-
+    print("Повідомлення про обов'язкове поле знайдено. Тест успішно завершено. 🎉")
 
     # Закриваємо браузер
     driver.quit()
 
+
+    
 # 4. Test 'search'
 
-@pytest.mark.ui_eros2
+@pytest.mark.ui_eros_search
 def test_search_vibrator():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.maximize_window()
