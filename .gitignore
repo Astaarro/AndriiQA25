@@ -36,3 +36,6 @@ out/
 # env-файли (секрети)
 .env
 .env.local
+
+# copilot файли
+copilot-instructions.md
