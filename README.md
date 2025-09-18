@@ -30,9 +30,9 @@ This repository contains a comprehensive QA Automation framework designed for le
 	pytest
 	```
 - **Run a specific test suite:**
-		```powershell
-		pytest -m {mark} -v
-		```
+	```powershell
+	pytest -m {mark} -v
+	```
 	All available marks can be found in `pytest.ini`.
 
 - **Debugging:**

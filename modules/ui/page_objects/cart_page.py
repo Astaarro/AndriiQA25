@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
 class CartPage(BasePage):
     """
     This class represents the cart page within the Page Object Model (POM) pattern.
