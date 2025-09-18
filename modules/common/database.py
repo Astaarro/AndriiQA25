@@ -56,11 +56,13 @@ class Database():
         self.cursor.execute(query)
         record = self.cursor.fetchall()
         return record
-    
-# Test for individual work
+
+
+# For personal work
 
     def get_name_product(self, name):
         query = f"SELECT name FROM products WHERE id = {name}"
         self.cursor.execute(query)
         record = self.cursor.fetchall()
+       
         return record

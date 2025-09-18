@@ -1,29 +1,26 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+
 
 class BasePage:
-    """Базовий клас для об'єктів сторінок, який містить загальні методи та ініціалізацію драйвера."""
-    
-    # Локатор для іконки/посилання кошика в хедері
-    CART_LINK = (By.CSS_SELECTOR, ".wd-header-cart a[href*='cart']")
+    """
+    A base class for page objects that contains common methods and driver initialization
+    """
 
-    def __init__(self, driver) -> None:
-        """Ініціалізує драйвер браузера або використовує існуючий."""
-        self.driver = driver
-        
+    # Initializes the browser driver or uses an existing one
+    def __init__(self, driver=None) -> None:
+        if driver is None:
+            options = Options()
+            service = Service(ChromeDriverManager().install())
+            self.driver = webdriver.Chrome(service=service, options=options)
+            self.driver.maximize_window()
+            print("New Chrome driver initialized.")
+        else:
+            self.driver = driver
+
+    # Closes the browser window
     def close(self):
-        """Закриває вікно браузера."""
         if self.driver:
             self.driver.close()
-
-    def go_to_cart_from_header(self):
-        """Переходить на сторінку кошика, натискаючи на посилання в хедері."""
-        print("Перехід до кошика через хедер...")
-        cart_link = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.CART_LINK)
-        )
-        cart_link.click()

@@ -1,32 +1,7 @@
 import pytest
 
-@pytest.mark.api
-def test_user_exists(github_api):
-    user = github_api.get_user('defunkt')
-    assert user['login'] == 'defunkt'
 
-@pytest.mark.api
-def test_user_not_exists(github_api):
-    r = github_api.get_user('AndriiSavinov1')
-    assert r['message'] == 'Not Found'
-
-@pytest.mark.api
-def test_repo_be_found(github_api):
-    r = github_api.search_repo('become-qa-auto')
-    assert r['total_count'] == 57
-    assert 'become-qa-auto' in r['items'][0]['name']
-
-@pytest.mark.api
-def test_repo_cannot_be_found(github_api):
-    r = github_api.search_repo('andrii_savinov_repo_pont_exist')
-    assert r['total_count'] == 0
-
-@pytest.mark.api
-def test_with_cingle_char_be_found(github_api):
-    r = github_api.search_repo('s')
-    assert r['total_count'] != 0
-
-#INDIVIDUAL TESTS
+# PERSONAL TESTS API GITHUB
 
 # Test1: Is the emoji "adult" included in the list?
 @pytest.mark.api
@@ -34,7 +9,6 @@ def test_emojis(github_api):
     r = github_api.emojis()
     
     assert 'adult' in r
-    #print(r)
 
 # Test2: Is the unexist emoji "adult10"?
 @pytest.mark.api
@@ -79,7 +53,6 @@ def test_user_name_in_commit(github_api):
 def test_rate_limit(github_api):
     r = github_api.rate_limit()
     remaining = r["resources"]["core"]["remaining"]
-    #print(r)
     print(f"\nRequests remaining: {remaining}")
 
     assert remaining >= 0
@@ -89,6 +62,37 @@ def test_rate_limit(github_api):
 @pytest.mark.api
 def test_repo_language(github_api):
     r = github_api.repo_language("Astaarro", "AndriiQA25")
-    #print(r)
+
     assert "Python" in r
+
+
+# QA AUTOMATION COURSE API GITHUB TESTS
+
+@pytest.mark.api
+def test_user_exists(github_api):
+    user = github_api.get_user('defunkt')
+    assert user['login'] == 'defunkt'
+
+@pytest.mark.api
+def test_user_not_exists(github_api):
+    r = github_api.get_user('AndriiSavinov1')
+    assert r['message'] == 'Not Found'
+
+@pytest.mark.api
+def test_repo_be_found(github_api):
+    r = github_api.search_repo('become-qa-auto')
+    assert r['total_count'] == 57
+    assert 'become-qa-auto' in r['items'][0]['name']
+
+@pytest.mark.api
+def test_repo_cannot_be_found(github_api):
+    r = github_api.search_repo('andrii_savinov_repo_pont_exist')
+    assert r['total_count'] == 0
+
+@pytest.mark.api
+def test_with_cingle_char_be_found(github_api):
+    r = github_api.search_repo('s')
+    assert r['total_count'] != 0
+
+
    

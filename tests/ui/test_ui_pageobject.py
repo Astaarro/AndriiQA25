@@ -9,10 +9,16 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
+# QA AUTOMATION COURSE TEST with PAGE OBGECT
+
+# Тест github невірний логін/пароль
+
 @pytest.mark.ui 
 def test_check_incorrect_usermane_page_object():
     # Стрворення обєкту сторніки
     sign_in_page = SignInPage()
+    
     # Відкриваємо сторінку https://github.com/login
     sign_in_page.go_to()
 
@@ -26,97 +32,93 @@ def test_check_incorrect_usermane_page_object():
     sign_in_page.close()
 
 
+# PERSONAL WORK with PAGE OBGECT
 
-# ІНДИВІДУАЛЬНІ ТЕСТИ з PAGE OBGECT
-
-# Тест переходу на рандомну категорію
+# Test for navigating to a random eros.in.ua category
 @pytest.mark.ui_eros_cat
 def test_open_random_for_her_category():
-    # Етап 1: Відкриття головної сторінки
+    # Opening the main page
     main_page = MainPage()
     expected_main_page_title = "Секс-шоп «Ерос»💘Онлайн магазин інтимних товарів в Україні"
     main_page.go_to()
     assert main_page.check_title(expected_main_page_title)
-    print("Крок 1: Головна сторінка відкрита. Назва відповідає очікуваній.")
+    print("The main page is open. The title matches the expected one.")
 
-    # Етап 2: Вибір випадкової категорії та перехід
+    # Selecting a random category and navigating to it
     selected_category_name = main_page.go_to_random_category()
-    print(f"Крок 2.1: Вибрано категорію '{selected_category_name}'.")
+    print(f"The category '{selected_category_name}' has been selected.")
     assert main_page.check_title_contains(selected_category_name)
-    print("Крок 2.2: Перевірка назви сторінки успішна. Вона містить назву категорії.")
+ 
 
-
-# Тест замовлення товару
+# Test for ordering a product on eros.in.ua
 @pytest.mark.ui_eros_prod
-def test_product_title_and_add_to_cart(driver):
-    # Етап 1: Ініціалізація сторінок з використанням фікстури 'driver'
-    product_page = ProductPage(driver)
-    
-    # Етап 2: Перехід на сторінку товару
+def test_product_title_and_add_to_cart():
+    # Step 1: Initializing the product page and a new driver instance
+    product_page = ProductPage()
+        
+    # Step 2: Navigating to the product page
     product_page.go_to()
-    print("Крок 1: Перехід на сторінку товару. ✅")
-    
-    # Етап 3: Отримання назви товару зі сторінки
+    print("Step 1: Navigating to the product page")
+
+    # Step 3: Getting the product title from the page
     product_name_on_page = product_page.get_product_title()
-    
-    # Етап 4: Перевірка, що назва товару є частиною заголовка сторінки
-    processed_product_name = product_name_on_page.replace("×", "x")
+
+    # Step 4: Verifying that the product title is part of the page's title
     page_title = product_page.driver.title
-    assert processed_product_name in page_title
-    print(f"Крок 2: Назва товару ('{product_name_on_page}') є в заголовку сторінки. ✅")
-    
-    # Етап 5: Натискаємо кнопку "Купити"
+    assert product_name_on_page in page_title
+    print(f"Step 2: The product title ('{product_name_on_page}') is in the page title")
+
+    # Step 5: Clicking the "Buy" button
     product_page.add_to_cart()
-    print("Крок 3: Натиснуто кнопку 'Купити'.")
-    
+    print("Step 3: The 'Buy' button has been clicked.")
+
     time.sleep(2)
-    
-    # Етап 6: Переходимо в кошик через посилання в хедері
+
+    # Step 6: Navigating to the cart via the header link
     product_page.go_to_cart_from_header()
-    
-    # Етап 7: Ініціалізація сторінки кошика з існуючим драйвером
-    cart_page = CartPage(driver)
-    print("Крок 4: Перехід до кошика. ✅")
-    
-    # Етап 8: Перевіряємо назву сторінки кошика
+
+    # Step 7: Initializing the cart page with the existing driver from product_page
+    cart_page = CartPage(product_page.driver)
+    print("Step 4: Navigating to the cart")
+
+    # Step 8: Checking the cart page's title
     expected_cart_title = "Кошик 💘 Інтим-Бутік ЕРОС"
     assert cart_page.driver.title == expected_cart_title
-    print(f"Крок 5: Назва сторінки кошика ('{cart_page.driver.title}') відповідає очікуваній. ✅")
-    
-    # Етап 9: Перевіряємо назву товару в кошику
+    print(f"Step 5: The cart page title ('{cart_page.driver.title}') matches the expected one")
+
+    # Step 9: Verifying the product title in the cart
     product_name_in_cart = cart_page.get_product_name_in_cart()
-    
-    assert product_name_in_cart.replace("x", "×").strip() == product_name_on_page.strip()
-    
-    print(f"Крок 6: Назва товару в кошику ('{product_name_in_cart}') відповідає назві на сторінці товару. ✅")
-    
-    # Етап 10: Переходимо до оформлення замовлення
+    assert product_name_in_cart == product_name_on_page.strip()
+    print(f"Step 6: The product title in the cart ('{product_name_in_cart}') matches the title on the product page")
+
+    # Step 10: Proceeding to checkout
     cart_page.proceed_to_checkout()
-    
-    # Етап 11: Перевіряємо назву сторінки оформлення замовлення
+
+    # Step 11: Verifying the checkout page's title
     expected_checkout_title = "Оформлення замовлення 💘 Інтим-Бутік ЕРОС"
-    assert driver.title == expected_checkout_title
-    print(f"Крок 8: Назва сторінки оформлення замовлення ('{driver.title}') відповідає очікуваній. ✅")
-    
-    # Етап 12: Ініціалізуємо сторінку оформлення замовлення
-    checkout_page = CheckoutPage(driver)
-    
-    # Етап 13: Заповнюємо форму замовлення
+    assert product_page.driver.title == expected_checkout_title
+    print(f"Step 8: The checkout page title ('{product_page.driver.title}') matches the expected one")
+
+    # Step 12: Initializing the checkout page
+    checkout_page = CheckoutPage(product_page.driver)
+
+    # Step 13: Filling out the order form
     checkout_page.fill_in_data("Андрій", "Сав", "096 1111111", "tessssst@ukr.net")
-    
-    # Етап 14: Ставимо чекбокс "Я згоден з умовами"
+
+    # Step 14: Checking the "I agree to the terms" checkbox
     checkout_page.accept_terms()
-    
-    # Етап 15: Натискаємо кнопку "Підтвердити замовлення"
+
+    # Step 15: Clicking the "Confirm order" button
     checkout_page.place_order()
-    
-    # Етап 16: Ініціалізуємо сторінку підтвердження замовлення
-    order_received_page = OrderReceivedPage(driver)
-    
-    # Етап 17: Перевіряємо текст підтвердження замовлення
+
+    # Step 16: Initializing the order received page
+    order_received_page = OrderReceivedPage(product_page.driver)
+
+    # Step 17: Verifying the order confirmation message
     expected_message = "Дякуємо. Ваше замовлення було отримано."
     actual_message = order_received_page.get_success_message()
     assert actual_message.strip() == expected_message.strip()
-    print(f"Крок 12: Повідомлення про успішне замовлення ('{actual_message}') відповідає очікуваному. ✅")
 
-    print("Тест оформлення замовлення завершено успішно. 🎉")
+
+    # Step 18: Closing the browser
+    product_page.close()
